@@ -14,3 +14,30 @@ function enable-msOfficeDeveloperTab {
       }
    }
 }
+
+function get-msOfficeComObject {
+
+   param (
+      [string] $app
+   )
+
+   $progId = "$app.application"
+
+   $officeObj = get-activeObject $progId
+   if ($officeObj -eq $null) {
+      write-debug "no obj found for $progId"
+      $officeObj = new-object -com $progId
+      if ($app -eq 'outlook') {
+         #
+         # Outlook does not have a .visible property on the application object!
+         #
+         # 6 = olFolderInbox
+         #
+         $officeObj.GetNamespace('MAPI').GetDefaultFolder(6).display()
+      }
+      else {
+         $officeObj.visible = $true
+      }
+   }
+   return $officeObj
+}
