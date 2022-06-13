@@ -1,10 +1,14 @@
 #
-#  V0.4
+#  V0.5
 #
 set-strictMode -version latest
 
 function get-msOfficeVersion {
    return ( (get-item hklm:\Software\Classes\excel.application\curVer).getValue('')  -replace '.*\.(\d+)', '$1' )
+}
+
+function get-msOfficeRegRoot {
+   return "hkcu:\Software\Microsoft\Office\$(get-msOfficeVersion).0"
 }
 
 
@@ -24,7 +28,7 @@ function enable-msOfficeDeveloperTab {
       [switch] $off
    )
 
-   $regKeyOfficeRootV = "hkcu:\Software\Microsoft\Office\$(get-msOfficeVersion).0"
+   $regKeyOfficeRootV = get-msOfficeRegRoot
 
    foreach ($prod in get-msOfficeProducts | where-object devTools) {
 
@@ -36,6 +40,29 @@ function enable-msOfficeDeveloperTab {
       }
       else {
           write-host "Not found for $regKeyOfficeApp"
+      }
+   }
+}
+
+function grant-msOfficeVBAaccess {
+
+   $regKeyOfficeRoot = get-msOfficeRegRoot
+
+   foreach ($prod in get-msOfficeProducts | where-object devTools) {
+
+      $regKeyOfficeApp ="$regKeyOfficeRoot/$($prod.name)"
+      if (test-path $regKeyOfficeApp) {
+         $secKey = "$regKeyOfficeApp/Security"
+         if (test-path $secKey) {
+            write-host "found: $secKey"
+            set-itemProperty $secKey -name AccessVBOM -type dWord -value 1
+         }
+         else {
+            write-host "not found: $secKey"
+         }
+      }
+      else {
+         write-host "not found $regKeyOfficeApp"
       }
    }
 }
