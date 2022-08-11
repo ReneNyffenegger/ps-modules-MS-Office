@@ -1,6 +1,6 @@
 @{
    RootModule        = 'MS-Office.psm1'
-   ModuleVersion     = '0.5'
+   ModuleVersion     = '0.6'
    RequiredModules   = @(
       'COM'
    )
@@ -9,6 +9,7 @@
       'enable-msOfficeDeveloperTab',
       'grant-msOfficeVBAaccess',
       'get-msOfficeComObject',
+      'get-msOfficeRegRoot',
       'get-msOfficeInstallationRoot'
    )
    AliasesToExport   = @(

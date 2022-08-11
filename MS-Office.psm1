@@ -1,5 +1,5 @@
 #
-#  V0.5
+#  V0.6
 #
 set-strictMode -version latest
 
