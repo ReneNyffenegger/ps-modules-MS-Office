@@ -36,6 +36,10 @@ function enable-msOfficeDeveloperTab {
       if (test-path $regKeyOfficeApp) {
          $value = 1
          if ($off) { $value = 0 }
+         if (-not (test-path "$regKeyOfficeApp\Options")) {
+            write-host "$regKeyOfficeApp\Options does not exist, creating it"
+            new-item -path "$regKeyOfficeApp\Options"
+         }
          set-itemProperty "$regKeyOfficeApp\Options" -name DeveloperTools -type dWord -value $value
       }
       else {
