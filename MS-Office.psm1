@@ -14,13 +14,20 @@ function get-msOfficeRegRoot {
 
 function get-msOfficeProducts {
 
-   return (new-object psObject -property ( [ordered] @{ name = 'Excel'     ; exe = 'excel.exe'   ; devTools = $true  })),
+   if (-not (test-path variable:script:msOfficeProducts)) {
+      $script:msOfficeProducts =
+          (new-object psObject -property ( [ordered] @{ name = 'Excel'     ; exe = 'excel.exe'   ; devTools = $true  })),
           (new-object psObject -property ( [ordered] @{ name = 'Access'    ; exe = 'msAccess.exe'; devTools = $false })),
           (new-object psObject -property ( [ordered] @{ name = 'Word'      ; exe = 'winWord.exe' ; devTools = $true  })),
           (new-object psObject -property ( [ordered] @{ name = 'Visio'     ; exe = 'visio.exe'   ; devTools = $false })),
           (new-object psObject -property ( [ordered] @{ name = 'Outlook'   ; exe = 'outlook.exe' ; devTools = $true  })),
           (new-object psObject -property ( [ordered] @{ name = 'PowerPoint'; exe = 'powerpnt.exe'; devTools = $true  }))
+
+   }
+
+   return $script:msOfficeProducts
 }
+
 
 function enable-msOfficeDeveloperTab {
 
@@ -31,6 +38,8 @@ function enable-msOfficeDeveloperTab {
    $regKeyOfficeRootV = get-msOfficeRegRoot
 
    foreach ($prod in get-msOfficeProducts | where-object devTools) {
+      $prod
+      continue
 
       $regKeyOfficeApp ="$regKeyOfficeRootV/$($prod.name)"
       if (test-path $regKeyOfficeApp) {
@@ -74,8 +83,14 @@ function grant-msOfficeVBAaccess {
 function get-msOfficeComObject {
 
    param (
-      [string] $app
+      [parameter(mandatory=$true)][string] $app
    )
+
+   if ( -not ((get-msOfficeProducts).name -contains $app)) {
+      write-textInConsoleErrorColor "$app is not a recognized Office name"
+      return $null
+   }
+
 
    $progId = "$app.application"
 
