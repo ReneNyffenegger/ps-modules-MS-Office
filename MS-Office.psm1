@@ -83,7 +83,8 @@ function grant-msOfficeVBAaccess {
 function get-msOfficeComObject {
 
    param (
-      [parameter(mandatory=$true)][string] $app
+      [parameter(mandatory=$true )][string ] $app,
+      [parameter(mandatory=$false)][boolean] $makeVisible = $true
    )
 
    if ( -not ((get-msOfficeProducts).name -contains $app)) {
@@ -98,18 +99,22 @@ function get-msOfficeComObject {
    if ($officeObj -eq $null) {
       write-debug "no obj found for $progId"
       $officeObj = new-object -com $progId
-      if ($app -eq 'outlook') {
-         #
-         # Outlook does not have a .visible property on the application object!
-         #
-         # 6 = olFolderInbox
-         #
-         $officeObj.GetNamespace('MAPI').GetDefaultFolder(6).display()
-      }
-      else {
-         $officeObj.visible = $true
+
+      if ($makeVisible) {
+         if ($app -eq 'outlook') {
+            #
+            # Outlook does not have a .visible property on the application object!
+            #
+            # 6 = olFolderInbox
+            #
+            $officeObj.GetNamespace('MAPI').GetDefaultFolder(6).display()
+         }
+         else {
+            $officeObj.visible = $true
+         }
       }
    }
+
    return $officeObj
 }
 

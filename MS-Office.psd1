@@ -1,6 +1,6 @@
 @{
    RootModule        = 'MS-Office.psm1'
-   ModuleVersion     = '0.8'
+   ModuleVersion     = '0.9'
    RequiredModules   = @(
       'COM'
    )
